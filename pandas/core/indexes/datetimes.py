@@ -2202,29 +2202,38 @@ def _generate_regular_range(start, end, periods, offset):
 def date_range(start=None, end=None, periods=None, freq='D', tz=None,
                normalize=False, name=None, closed=None, **kwargs):
     """
-    Return a fixed frequency DatetimeIndex, with day (calendar) as the default
-    frequency
+    Return a fixed frequency DatetimeIndex, with day (calendar) as the default frequency.
 
     Parameters
     ----------
     start : string or datetime-like, default None
-        Left bound for generating dates
+        Left bound for generating dates.Data (part of **kwargs) takes precedence over 
+        start , periods and end argument.
     end : string or datetime-like, default None
-        Right bound for generating dates
+        Right bound for generating dates.
     periods : integer, default None
-        Number of periods to generate
+        If start is passed then Number of next periods to generate.
+        If end is passed then Number of previous periods to generate.
     freq : string or DateOffset, default 'D' (calendar daily)
-        Frequency strings can have multiples, e.g. '5H'
-    tz : string, default None
+        Frequency strings can have multiples, e.g. '5H'.
+    tz : string or pytz.timezone() or dateutil.tz.tzfile(), default None
         Time zone name for returning localized DatetimeIndex, for example
-        Asia/Hong_Kong
+        Asia/Hong_Kong.
     normalize : bool, default False
-        Normalize start/end dates to midnight before generating date range
+        Normalize start date to midnight before generating date range.
+        If True then hours passed in start are ignored.
     name : string, default None
-        Name of the resulting DatetimeIndex
+        Name of the resulting DatetimeIndex.
     closed : string, default None
         Make the interval closed with respect to the given frequency to
-        the 'left', 'right', or both sides (None)
+        the 'left', 'right', or both sides (None).
+    kwargs : keyword, value pairs
+        Other parameters accepted by DatetimeIndex().
+
+    See Also
+    --------
+    DatetimeIndex
+        Return parameter type.
 
     Notes
     -----
@@ -2233,10 +2242,33 @@ def date_range(start=None, end=None, periods=None, freq='D', tz=None,
 
     To learn more about the frequency strings, please see `this link
     <http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases>`__.
-
+    
     Returns
     -------
     rng : DatetimeIndex
+    
+    Examples
+    --------
+    >>> pd.date_range("2015-01-01", "2015-01-10")
+    DatetimeIndex(['2015-01-01', '2015-01-02', '2015-01-03', '2015-01-04',
+               '2015-01-05', '2015-01-06', '2015-01-07', '2015-01-08',
+               '2015-01-09', '2015-01-10'],
+              dtype='datetime64[ns]', freq='D')
+    >>> pd.date_range("2015-01-01", periods= 5)
+    DatetimeIndex(['2015-01-01', '2015-01-02', '2015-01-03', '2015-01-04',
+               '2015-01-05'],
+              dtype='datetime64[ns]', freq='D')
+    >>> pd.date_range("2015-01-01", periods= 5, data=["2017-01-01"]) #data argument overrides, start , periods and end arguments
+    DatetimeIndex(['2017-01-01'], dtype='datetime64[ns]', freq='D')
+    >>> pd.date_range(end="2017-01-01", periods= 5)
+    DatetimeIndex(['2016-12-28', '2016-12-29', '2016-12-30', '2016-12-31',
+               '2017-01-01'],
+              dtype='datetime64[ns]', freq='D')
+    >>> pd.date_range("2017-01-01", periods= 5, freq="5H")
+    DatetimeIndex(['2017-01-01 00:00:00', '2017-01-01 05:00:00',
+               '2017-01-01 10:00:00', '2017-01-01 15:00:00',
+               '2017-01-01 20:00:00'],
+              dtype='datetime64[ns]', freq='5H')
     """
     return DatetimeIndex(start=start, end=end, periods=periods,
                          freq=freq, tz=tz, normalize=normalize, name=name,
